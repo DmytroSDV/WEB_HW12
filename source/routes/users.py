@@ -5,9 +5,8 @@ from source.database.db import get_db
 from source.repository import users as repository_users
 from source.schemas.user import UserSchema, UserResponse
 
-from source.models.models import Consumer#,Role
+from source.models.models import Consumer
 from source.services.auth import auth_service
-# from source.services.roles import RoleAccess
 
 router = APIRouter(prefix='/users', tags=['users'])
 
