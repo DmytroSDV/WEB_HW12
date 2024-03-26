@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "web-hw12"
+version = "0.1.0"
+description = ""
+authors = ["DmytroSDV <sdmytrov11@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+uvicorn = {extras = ["standart"], version = "^0.29.0"}
+fastapi = "^0.110.0"
+sqlalchemy = "^2.0.28"
+asyncpg = "^0.29.0"
+pydantic = {extras = ["email"], version = "^2.6.4"}
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+python-multipart = "^0.0.9"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+libgravatar = "^1.0.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
