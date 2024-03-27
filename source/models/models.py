@@ -32,3 +32,8 @@ class Consumer(Base):
     refresh_token: Mapped[str] = mapped_column(String(255), nullable=True)
     created_at: Mapped[date] = mapped_column('created_at', DateTime, default=func.now())
     updated_at: Mapped[date] = mapped_column('updated_at', DateTime, default=func.now(), onupdate=func.now())
+
+class Role(enum.Enum):
+    admin: str = "admin"
+    moderator: str = "moderator"
+    user: str = "user"

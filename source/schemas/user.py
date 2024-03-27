@@ -3,6 +3,8 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr, Field
 from datetime import date
 
+from source.models.models import Role
+
 class UserSchema(BaseModel):
     first_name: str = Field(min_length=3, max_length=50)
     second_name: str = Field(min_length=3, max_length=50)
@@ -18,6 +20,7 @@ class UserResponse(BaseModel):
     email_add:  EmailStr
     phone_num:  str
     birth_date:  date
+    role: Role
 
     class Config:
         from_attributes = True
