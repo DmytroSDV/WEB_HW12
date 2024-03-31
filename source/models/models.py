@@ -41,3 +41,8 @@ class Consumer(Base):
     role: Mapped[Enum] = mapped_column('role', Enum(Role), default=Role.user, nullable=False)
 
 
+
+class Role(enum.Enum):
+    admin: str = "admin"
+    moderator: str = "moderator"
+    user: str = "user"
