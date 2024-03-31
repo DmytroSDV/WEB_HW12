@@ -1,19 +1,27 @@
 from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from source.models.models import User
+from source.models.models import User, Consumer
 from source.schemas.user import UserSchema
 
 from datetime import datetime, timedelta
 
-async def get_users(limit: int, offset: int, db: AsyncSession):
+async def get_users(limit: int, offset: int, db: AsyncSession, consumer: Consumer):
+    search = select(User).filter_by(consumer=consumer).offset(offset).limit(limit)
+    users = await db.execute(search)
+    return users.scalars().all()
+
+async def get_all_users(limit: int, offset: int, db: AsyncSession):
     search = select(User).offset(offset).limit(limit)
     users = await db.execute(search)
     return users.scalars().all()
 
-async def get_users_by(first_name: str = None, second_name: str = None, email_add: str = None, db: AsyncSession = None):
+async def get_users_by(first_name: str = None, 
+                       second_name: str = None, 
+                       email_add: str = None, db: AsyncSession = None, 
+                       consumer: Consumer = None):
     
-    search = select(User)
+    search = select(User).filter_by(consumer=consumer)
     if first_name and second_name and email_add:
         search = search.where(or_(User.first_name == first_name, User.second_name == second_name, User.email_add == email_add))
 
@@ -42,31 +50,33 @@ async def get_users_by(first_name: str = None, second_name: str = None, email_ad
     print(type(users.scalars().all()))
     return users.scalars().all()
 
-async def get_user(user_id: int, db: AsyncSession):
-    search = select(User).filter_by(id=user_id)
+async def get_user(user_id: int, db: AsyncSession, consumer: Consumer):
+    search = select(User).filter_by(id=user_id, consumer=consumer)
     user = await db.execute(search)
     return user.scalar_one_or_none()
 
-async def get_users_birth(limit: int, db: AsyncSession):
+async def get_users_birth(limit: int, db: AsyncSession, consumer: Consumer):
     
     current_date = datetime.now().date()
     end_date = current_date + timedelta(days=limit)
     
-    search = select(User).filter(User.birth_date >= current_date, User.birth_date <= end_date)
+    search = select(User).filter_by(User.birth_date >= current_date, 
+                                    User.birth_date <= end_date,
+                                    consumer=consumer)
     result = await db.execute(search)
 
     return result.scalars().all()
 
-async def create_user(body: UserSchema, db: AsyncSession):
-    user = User(**body.model_dump(exclude_unset=True))
+async def create_user(body: UserSchema, db: AsyncSession, consumer: Consumer):
+    user = User(**body.model_dump(exclude_unset=True), consumer=consumer)
     db.add(user)
     await db.commit()
     await db.refresh(user)
     return user
 
 
-async def update_user(user_id: int, body: UserSchema, db: AsyncSession):
-    search = select(User).filter_by(id=user_id)
+async def update_user(user_id: int, body: UserSchema, db: AsyncSession, consumer: Consumer):
+    search = select(User).filter_by(id=user_id, consumer=consumer)
     result = await db.execute(search)
     user = result.scalar_one_or_none()
     if user:
@@ -80,8 +90,8 @@ async def update_user(user_id: int, body: UserSchema, db: AsyncSession):
     return  user
 
 
-async def delete_user(user_id: int, db: AsyncSession):
-    search = select(User).filter_by(id=user_id)
+async def delete_user(user_id: int, db: AsyncSession, consumer: Consumer):
+    search = select(User).filter_by(id=user_id, consumer=consumer)
     user = await db.execute(search)
     user = user.scalar_one_or_none()
     if user:

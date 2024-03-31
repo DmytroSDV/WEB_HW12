@@ -16,11 +16,17 @@ class User(Base):
     email_add: Mapped[str] = mapped_column(String(100), unique=True, index=True)
     phone_num: Mapped[str] = mapped_column(String(50), unique=True, index=True)
     birth_date: Mapped[DateTime] = mapped_column(DateTime, nullable=False)
-    updated_at: Mapped[date] = mapped_column('updated_at', DateTime, default=func.now(), 
-                                             onupdate=func.now(), nullable=True)
+    created_at: Mapped[date] = mapped_column("crated_at", DateTime, default=func.now(),nullable=True)
+    updated_at: Mapped[date] = mapped_column('updated_at', DateTime, 
+                                             default=func.now(), onupdate=func.now(), nullable=True)
 
     consumer_id: Mapped[int] = mapped_column(Integer, ForeignKey('consumers.id'), nullable=True)
-    consumer: Mapped["User"] = relationship("Consumer", backref="users", lazy="joined")
+    consumer: Mapped["Consumer"] = relationship("Consumer", backref="users", lazy="joined")
+
+class Role(enum.Enum):
+    admin: str = "admin"
+    moderator: str = "moderator"
+    user: str = "user"
 
 class Consumer(Base):
     __tablename__ = 'consumers'
@@ -32,3 +38,6 @@ class Consumer(Base):
     refresh_token: Mapped[str] = mapped_column(String(255), nullable=True)
     created_at: Mapped[date] = mapped_column('created_at', DateTime, default=func.now())
     updated_at: Mapped[date] = mapped_column('updated_at', DateTime, default=func.now(), onupdate=func.now())
+    role: Mapped[Enum] = mapped_column('role', Enum(Role), default=Role.user, nullable=False)
+
+
